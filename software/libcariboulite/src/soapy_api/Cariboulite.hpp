@@ -65,9 +65,9 @@ public:
         std::vector<std::string> getStreamFormats(const int direction, const size_t channel) const;
         std::string getNativeStreamFormat(const int direction, const size_t channel, double &fullScale) const;
         SoapySDR::ArgInfoList getStreamArgsInfo(const int direction, const size_t channel) const;
-        SoapySDR::Stream *setupStream(  const int direction, 
-                                        const std::string &format, 
-                                        const std::vector<size_t> &channels = std::vector<size_t>(), 
+        SoapySDR::Stream *setupStream(  const int direction,
+                                        const std::string &format,
+                                        const std::vector<size_t> &channels = std::vector<size_t>(),
                                         const SoapySDR::Kwargs &args = SoapySDR::Kwargs());
         void closeStream(SoapySDR::Stream *stream);
         size_t getStreamMTU(SoapySDR::Stream *stream) const;
@@ -83,6 +83,14 @@ public:
                         int &flags,
                         long long &timeNs,
                         const long timeoutUs = 100000);
+
+        int writeStream( SoapySDR::Stream *stream,
+                        const void * const *buffs,
+                        const size_t numElems,
+                        int &flags,
+                        long long timeNs,
+                        const long timeoutUs = 100000);
+
 
         /*******************************************************************
          * Antenna API

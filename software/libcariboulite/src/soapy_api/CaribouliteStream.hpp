@@ -61,10 +61,10 @@ typedef struct
 #pragma pack()
 
 // The forward declared Stream Class
-class SoapySDR::Stream 
+class SoapySDR::Stream
 {
 public:
-	enum CaribouliteFormat 
+	enum CaribouliteFormat
 	{
 		CARIBOULITE_FORMAT_FLOAT32	= 0,
 		CARIBOULITE_FORMAT_INT16	= 1,
@@ -72,7 +72,7 @@ public:
 		CARIBOULITE_FORMAT_FLOAT64  = 3,
 	};
 	CaribouliteFormat format;
-	
+
 	enum DigitalFilterType
 	{
 		DigitalFilter_None = 0,
@@ -94,13 +94,20 @@ public:
 	int ReadSamples(sample_complex_int8* buffer, size_t num_elements, long timeout_us);
 	int ReadSamplesGen(void* buffer, size_t num_elements, long timeout_us);
 
+	int WriteSamples(caribou_smi_sample_complex_int16* buffer, size_t num_elements, long timeout_us);
+	int WriteSamples(sample_complex_float* buffer, size_t num_elements, long timeout_us);
+	int WriteSamples(sample_complex_double* buffer, size_t num_elements, long timeout_us);
+	int WriteSamples(sample_complex_int8* buffer, size_t num_elements, long timeout_us);
+	int WriteSamplesGen(void* buffer, size_t num_elements, long timeout_us);
+
+
 	cariboulite_channel_dir_en getInnerStreamType(void);
     void setInnerStreamType(cariboulite_channel_dir_en dir);
 	void setDigitalFilter(DigitalFilterType type);
 	int setFormat(const std::string &fmt);
 	inline int readerThreadRunning() {return reader_thread_running;}
     void activateStream(int active) {stream_active = active;}
-    
+
 public:
     cariboulite_radio_state_st *radio;
     cariboulite_channel_dir_en native_dir;
@@ -109,7 +116,7 @@ public:
     int stream_active;
     int reader_thread_running;
 	circular_buffer<caribou_smi_sample_complex_int16> *rx_queue;
-    
+
 	caribou_smi_sample_complex_int16 *interm_native_buffer1;
     caribou_smi_sample_complex_int16 *interm_native_buffer2;
     caribou_smi_sample_meta* interm_native_meta;

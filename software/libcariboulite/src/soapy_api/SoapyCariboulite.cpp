@@ -22,8 +22,8 @@ SoapySDR::KwargsList findCariboulite(const SoapySDR::Kwargs &args)
 	// Library Version
     cariboulite_lib_version_st lib_version;
     cariboulite_lib_version(&lib_version);
-    
-    SoapySDR_logf(SOAPY_SDR_DEBUG, "CaribouLite Lib v%d.%d rev %d", 
+
+    SoapySDR_logf(SOAPY_SDR_DEBUG, "CaribouLite Lib v%d.%d rev %d",
                 lib_version.major_version, lib_version.minor_version, lib_version.revision);
 
 	// Detect CaribouLite board
@@ -32,11 +32,11 @@ SoapySDR::KwargsList findCariboulite(const SoapySDR::Kwargs &args)
         SoapySDR_logf(SOAPY_SDR_DEBUG, "No Cariboulite boards found");
         return results;
     }
-    
+
 	// to support for two channels, each CaribouLite detected will be identified as
 	// two boards for the SoapyAPI
     int devId = 0;
-    for (int i = 0; i < count; i++) 
+    for (int i = 0; i < count; i++)
     {
         // make sure its our board
         if (!strcmp(board_info.product_name, "CaribouLite RPI Hat") &&
@@ -53,7 +53,7 @@ SoapySDR::KwargsList findCariboulite(const SoapySDR::Kwargs &args)
                 serialstr << std::hex << ((board_info.numeric_serial_number << 1) | ch);
                 label << (ch?std::string("CaribouLite HiF"):std::string("CaribouLite S1G")) << "[" << serialstr.str() << "]";
 
-                SoapySDR_logf(SOAPY_SDR_DEBUG, "Serial %s", serialstr.str().c_str());        
+                SoapySDR_logf(SOAPY_SDR_DEBUG, "Serial %s", serialstr.str().c_str());
 
                 soapyInfo["device_id"] = std::to_string(devId);
                 soapyInfo["label"] = label.str();
@@ -69,10 +69,10 @@ SoapySDR::KwargsList findCariboulite(const SoapySDR::Kwargs &args)
             }
         }
     }
-   
+
 	// no filterring specified, return all results
-    if (args.count("serial") == 0 && 
-		args.count("label") == 0 && 
+    if (args.count("serial") == 0 &&
+		args.count("label") == 0 &&
 		args.count("device_id") == 0 &&
 		args.count("channel") == 0) return results;
 
@@ -93,7 +93,7 @@ SoapySDR::KwargsList findCariboulite(const SoapySDR::Kwargs &args)
 		std::string curSerial = curArgs.at("serial");
 		std::string curLabel = curArgs.at("label");
 		std::string curChannel = curArgs.at("channel");
-		
+
 		if (curDevNum == req_dev_num ||
 			!curSerial.compare(req_serial) ||
 			!curLabel.compare(req_label) ||

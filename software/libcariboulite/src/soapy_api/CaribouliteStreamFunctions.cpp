@@ -97,14 +97,14 @@ SoapySDR::ArgInfoList Cariboulite::getStreamArgsInfo(const int direction, const 
 * concurrently from multiple threads.
 * \endparblock
 */
-SoapySDR::Stream *Cariboulite::setupStream(const int direction, 
-                            const std::string &format, 
-                            const std::vector<size_t> &channels, 
+SoapySDR::Stream *Cariboulite::setupStream(const int direction,
+                            const std::string &format,
+                            const std::vector<size_t> &channels,
                             const SoapySDR::Kwargs &args)
 {
     // stream is already pre-allocated (both for TX and RX)
-    SoapySDR_logf(SOAPY_SDR_INFO, "setupStream: dir= %s, format= %s", 
-                                direction == SOAPY_SDR_TX ? "TX" : "RX", 
+    SoapySDR_logf(SOAPY_SDR_INFO, "setupStream: dir= %s, format= %s",
+                                direction == SOAPY_SDR_TX ? "TX" : "RX",
 								format.c_str());
 
 	// configure the stream
@@ -115,7 +115,7 @@ SoapySDR::Stream *Cariboulite::setupStream(const int direction,
 	}
 
     stream->setInnerStreamType(direction == SOAPY_SDR_TX ? cariboulite_channel_dir_tx : cariboulite_channel_dir_rx);
-    
+
 	cariboulite_radio_set_cw_outputs(&radio, false, false);
     cariboulite_radio_activate_channel(&radio, stream->getInnerStreamType(), false);
     return stream;
@@ -212,7 +212,7 @@ int Cariboulite::deactivateStream(SoapySDR::Stream *stream, const int flags, con
      *
      * \param stream the opaque pointer to a stream handle
      * \param buffs an array of void* buffers num chans in size
-     * \param numElems the number of elements in each buffer 
+     * \param numElems the number of elements in each buffer
      *                  (number of samples - for us its 4 bytes per sample)
      * \param flags optional flag indicators about the result
      * \param timeNs the buffer's timestamp in nanoseconds
@@ -227,6 +227,7 @@ int Cariboulite::readStream(
             long long &timeNs,
             const long timeoutUs)
 {
+    SoapySDR_logf(SOAPY_SDR_INFO, "Cariboulite::readStream - entry");
 	// Verify that it is an RX stream
     if (stream->getInnerStreamType() != cariboulite_channel_dir_rx)
     {
@@ -234,4 +235,44 @@ int Cariboulite::readStream(
     }
 
     return stream->ReadSamplesGen((void*)buffs[0], numElems, timeoutUs);
+}
+
+
+//========================================================
+/*!
+     * Write elements to a stream for transmission.
+     * This is a multi-channel call, and buffs should be an array of void *,
+     * where each pointer will be filled with data for a different channel.
+     *
+     * **Client code compatibility:**
+     * Client code relies on writeStream() for proper back-pressure.
+     * The writeStream() implementation must enforce the timeout
+     * such that the call blocks until space becomes available
+     * or timeout expiration.
+     *
+     * \param stream the opaque pointer to a stream handle
+     * \param buffs an array of void* buffers num chans in size
+     * \param numElems the number of elements in each buffer
+     * \param flags optional input flags and output flags
+     * \param timeNs the buffer's timestamp in nanoseconds
+     * \param timeoutUs the timeout in microseconds
+     * \return the number of elements written per buffer or error
+     */
+int Cariboulite::writeStream(
+        SoapySDR::Stream *stream,
+        const void * const *buffs,
+        const size_t numElems,
+        int &flags,
+        long long timeNs,
+        const long timeoutUs)
+{
+    // SoapySDR_logf(SOAPY_SDR_INFO, "Cariboulite::writeStream - entry");
+	// Verify that it is a TX stream
+    if (stream->getInnerStreamType() != cariboulite_channel_dir_tx)
+    {
+        SoapySDR_logf(SOAPY_SDR_ERROR, "Cariboulite::writeStream - not TX stream!!");
+        return SOAPY_SDR_NOT_SUPPORTED;
+    }
+
+    return stream->WriteSamplesGen((void*)buffs[0], numElems, timeoutUs);
 }
